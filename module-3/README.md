@@ -2,14 +2,6 @@
 
 A demo service for platform engineering observability, simulating a platform team receiving and processing feature requests from development teams.
 
-## Features
-
-- **REST API** for creating platform requests
-- **PostgreSQL** database for persistence
-- **OpenTelemetry** metrics, traces, and logs
-- **Docker Compose** setup with full observability stack
-- **Dash0 integration** for cloud-based observability
-
 ## Quick Start
 
 ### 1. Configure Dash0 (Optional)
@@ -46,7 +38,7 @@ This starts:
 - **OpenSearch** (port 9200) - Log storage
 - **OpenSearch Dashboards** (port 5601) - Log visualization
 
-**With Dash0 configured**, telemetry data is automatically sent to both local tools and Dash0 cloud.
+**With Dash0 configured**, telemetry data is automatically sent to both local tools and Dash0.
 
 ## API Endpoints
 
@@ -119,29 +111,3 @@ curl -X POST 'localhost:8080/requests?error=true' \
 - Structured JSON logs with trace correlation
 - Success: `request_processed` with details
 - Error: `request_failed` with context
-
-## Dashboards & Visualization
-
-### Perses (port 3000)
-- **JVM & Application Metrics Dashboard** - Pre-configured dashboard showing:
-  - Platform request rates and response times
-  - Requests by team breakdown  
-  - JVM memory usage and garbage collection
-  - Thread and class loading metrics
-  - HTTP request rates by status
-- **Prometheus Datasource** - Automatically configured to connect to Prometheus
-
-### Other UIs
-- **Prometheus** (port 9090) - Raw metrics and query interface
-- **Jaeger** (port 16686) - Distributed tracing visualization  
-- **OpenSearch Dashboards** (port 5601) - Log analysis and search
-
-## Architecture
-
-```
-Platform Service → OpenTelemetry Collector → {Local: Prometheus → Perses, Jaeger, OpenSearch}
-       ↓                                    → {Cloud: Dash0 (when configured)}
-   PostgreSQL
-```
-
-The service automatically exports telemetry data via OpenTelemetry to the collector, which distributes it to both local observability tools and Dash0 cloud when configured.
