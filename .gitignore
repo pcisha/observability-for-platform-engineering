@@ -1,6 +1,9 @@
 # Environments
 .env
 module-3/.env
+
+# Perses runtime data
+module-3/perses/data/
 .venv
 env/
 venv/
