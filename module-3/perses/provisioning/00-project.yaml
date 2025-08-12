@@ -1,0 +1,7 @@
+kind: Project
+metadata:
+  name: perses
+spec:
+  display:
+    name: "Platform Observability"
+    description: "Default project for platform request service observability"

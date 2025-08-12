@@ -1,0 +1,11 @@
+database:
+  file:
+    folder: /var/lib/perses/db
+
+security:
+  enable_auth: false
+
+provisioning:
+  interval: 1h
+  folders:
+    - /etc/perses/provisioning

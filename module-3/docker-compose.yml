@@ -1,0 +1,107 @@
+services:
+  opensearch:
+    image: opensearchproject/opensearch:2.14.0
+    platform: linux/amd64
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=SecureP@ssw0rd123
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.14.0
+    platform: linux/amd64
+    ports:
+      - "5601:5601"
+    environment:
+      - OPENSEARCH_HOSTS=https://opensearch:9200
+      - OPENSEARCH_USERNAME=admin
+      - OPENSEARCH_PASSWORD=SecureP@ssw0rd123
+    depends_on:
+      - opensearch
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+
+  perses:
+    image: persesdev/perses:latest
+    ports:
+      - "3000:8080"
+    volumes:
+      - ./perses/provisioning:/etc/perses/provisioning:ro
+      - ./perses-data:/var/lib/perses/db
+    environment:
+      - PERSES_SECURITY_ENABLE_AUTH=false
+      - PERSES_DATABASE_FILE_FOLDER=/var/lib/perses/db
+      - PERSES_PROVISIONING_INTERVAL=10s
+      - PERSES_PROVISIONING_FOLDERS_0=/etc/perses/provisioning
+      - PERSES_LOG_LEVEL=debug
+    depends_on:
+      - prometheus
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.52
+    ports:
+      - "16686:16686" # UI only
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    expose:
+      - "4317"
+
+  otel-collector:
+    image: ${OPENTELEMETRY_COLLECTOR_CONTAINER_IMAGE:-otel/opentelemetry-collector-contrib:0.100.0}
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP  
+      - "8889:8889" # Prometheus metrics endpoint
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otelcol/config.yaml
+    command: [ "--config=/etc/otelcol/config.yaml" ]
+    environment:
+      - DASH0_ENDPOINT_OTLP_GRPC_HOSTNAME=${DASH0_ENDPOINT_OTLP_GRPC_HOSTNAME}
+      - DASH0_ENDPOINT_OTLP_GRPC_PORT=${DASH0_ENDPOINT_OTLP_GRPC_PORT}
+      - DASH0_AUTH_TOKEN=${DASH0_AUTH_TOKEN}
+      - DASH0_DATASET=${DASH0_DATASET}
+      - OPENTELEMETRY_COLLECTOR_LOG_LEVEL=${OPENTELEMETRY_COLLECTOR_LOG_LEVEL:-info}
+    depends_on:
+      - opensearch
+      - jaeger
+
+  postgres:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=platform_requests
+      - POSTGRES_USER=platform
+      - POSTGRES_PASSWORD=platform123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  platform-service:
+    build: ./platform-service
+    ports:
+      - "8080:8080"
+    environment:
+      - OTEL_SERVICE_NAME=platform-request-service
+      - OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/platform_requests
+      - SPRING_DATASOURCE_USERNAME=platform
+      - SPRING_DATASOURCE_PASSWORD=platform123
+    depends_on:
+      - otel-collector
+      - postgres
+
+volumes:
+  postgres_data:
+  perses_data:

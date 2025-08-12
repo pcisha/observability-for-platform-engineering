@@ -1,0 +1,1 @@
+{"kind":"Datasource","metadata":{"name":"prometheus","createdAt":"2025-08-12T12:48:55.670039259Z","updatedAt":"2025-08-12T13:01:58.948339052Z","version":12,"project":"perses"},"spec":{"default":true,"plugin":{"kind":"PrometheusDatasource","spec":{"proxy":{"kind":"HTTPProxy","spec":{"url":"http://prometheus:9090"}}}}}}
