@@ -37,13 +37,13 @@ services:
     ports:
       - "3000:8080"
     volumes:
-      - ./perses/provisioning:/etc/perses/provisioning:ro
-      - ./perses-data:/var/lib/perses/db
+      - ./perses:/etc/perses/config:ro
+      - ./perses/data:/var/lib/perses/db
     environment:
       - PERSES_SECURITY_ENABLE_AUTH=false
       - PERSES_DATABASE_FILE_FOLDER=/var/lib/perses/db
       - PERSES_PROVISIONING_INTERVAL=10s
-      - PERSES_PROVISIONING_FOLDERS_0=/etc/perses/provisioning
+      - PERSES_PROVISIONING_FOLDERS_0=/etc/perses/config
       - PERSES_LOG_LEVEL=debug
     depends_on:
       - prometheus
