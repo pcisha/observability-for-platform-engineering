@@ -2,7 +2,7 @@
 
 # Observability for Platform Engineering
 
-This repository contains the hands-on demos and exercises from an introductory course focused on equipping platform engineers with foundational knowledge and practical skills to set up, manage, and maintain observability tools and practices using OpenTelemetry and open standards.
+This repository contains the hands-on demos and exercises focused on equipping platform engineers with foundational knowledge and practical skills to set up, manage, and maintain observability tools and practices using OpenTelemetry and open standards.
 
 ## Prerequisites
 
